@@ -1,0 +1,12 @@
+server:
+  port: 8080
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: patient-service
+          uri: lb://patient-service
+          predicates:
+            - Path=/api/patient/**   # Nouveau chemin public
+          filters:
+            - RewritePath=/api/patient/(?<segment>.*), /patient/$\{segment}

@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: patient-service
+  config:
+    import: optional:configserver:http://config-service:8888
+  cloud:
+    consul:
+      discovery:
+        prefer-ip-address: true
+        hostname: patient-service
+        health-check-path: /patient/actuator/health
+      host: consul-server
+      port: 8500
+
+logging:
+  level:
+    org:
+      springframework:
+        web: DEBUG
+  file:
+    name: logs/logs.log
