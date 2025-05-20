@@ -8,7 +8,6 @@ services:
       PGDATA: /var/lib/postgresql/data
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
       - "5432:5432"
     networks:
@@ -20,7 +19,7 @@ services:
       timeout: 5s
       retries: 5
 
-  consul-server:
+  consul:
     image: consul:1.15.0
     container_name: consul-server
     command: "agent -server -ui -node=consul-server -bootstrap-expect=1 -client=0.0.0.0"
@@ -31,106 +30,104 @@ services:
       - consul-data:/consul/data
     networks:
       - consul-network
-
-  config-service:
-    image: config-service
-    container_name: config-service
-    ports:
-      - "8888:8888"
-    networks:
-      - consul-network
     healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:8888/actuator/health" ]
-      interval: 30s
+      test: [ "CMD-SHELL", "curl -f http://localhost:8500/v1/status/leader || exit 1" ]
+      interval: 10s
       timeout: 10s
-      retries: 3
-    environment:
-      - SPRING_CLOUD_CONSUL_HOST=consul-server
-      - SPRING_CLOUD_CONSUL_DISCOVERY_HOSTNAME=config-service  # Important !
+      retries: 5
+    restart: unless-stopped
+
+#  config-service:
+#    build: ./config-service
+#    container_name: config-service
+#    ports:
+#      - "8888:8888"
+#    networks:
+#      - consul-network
+#    environment:
+#      - SPRING_CLOUD_CONSUL_HOST=consul
+#      - SPRING_CLOUD_CONSUL_DISCOVERY_HOSTNAME=config-service
+#    healthcheck:
+#      test: [ "CMD", "curl", "-f", "http://localhost:8888/actuator/health" ]
+#      interval: 10s
+#      timeout: 10s
+#      retries: 5
 
   patient-service:
-    image: patient-service
+    build: ./patient-service
     container_name: patient-service
     ports:
       - "8081:8081"
     networks:
       - consul-network
     environment:
-      - SPRING_CLOUD_CONSUL_HOST=consul-server
-      - SPRING_CLOUD_CONSUL_DISCOVERY_HOSTNAME=patient-service
-      - SPRING_CLOUD_CONSUL_DISCOVERY_PREFERIPADDRESS=false
+      SPRING_CLOUD_CONSUL_HOST: consul
+      SPRING_CLOUD_CONSUL_DISCOVERY_HOSTNAME: patient-service
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:8081/actuator/health" ]
-      interval: 30s
+      interval: 10s
       timeout: 10s
-      retries: 3
+      retries: 5
     depends_on:
-      config-service:
-        condition: service_healthy
-      postgres:
-        condition: service_healthy
-
-
+      - consul
+      - postgres
 
   rdv-service:
-    image: rdv-service
+    build: ./rdv-service
     container_name: rdv-service
     ports:
       - "8082:8082"
     networks:
       - consul-network
     environment:
-      - SPRING_CLOUD_CONSUL_HOST=consul-server
-      - SPRING_CLOUD_CONSUL_DISCOVERY_HOSTNAME=rdv-service
-      - SPRING_CLOUD_CONSUL_DISCOVERY_PREFERIPADDRESS=false
+      SPRING_CLOUD_CONSUL_HOST: consul
+      SPRING_CLOUD_CONSUL_DISCOVERY_HOSTNAME: rdv-service
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:8082/actuator/health" ]
-      interval: 30s
+      interval: 10s
       timeout: 10s
-      retries: 3
+      retries: 5
     depends_on:
-      config-service:
-        condition: service_healthy
-      postgres:
-        condition: service_healthy
+      - consul
+      - postgres
 
   dossier-service:
-    image: dossier-service
+    build: ./dossier-service
     container_name: dossier-service
     ports:
       - "8083:8083"
     networks:
       - consul-network
     environment:
-      - SPRING_CLOUD_CONSUL_HOST=consul-server
-      - SPRING_CLOUD_CONSUL_DISCOVERY_HOSTNAME=dossier-service
-      - SPRING_CLOUD_CONSUL_DISCOVERY_PREFERIPADDRESS=false
+      SPRING_CLOUD_CONSUL_HOST: consul
+      SPRING_CLOUD_CONSUL_DISCOVERY_HOSTNAME: dossier-service
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:8083/actuator/health" ]
-      interval: 30s
+      interval: 10s
       timeout: 10s
-      retries: 3
+      retries: 5
     depends_on:
-      config-service:
-        condition: service_healthy
-      postgres:
-        condition: service_healthy
+      - consul
+      - postgres
 
-
-  gateway-service:
-    image: gateway-service
-    container_name: gateway-service
+  gateway:
+    build: ./gateway
+    container_name: gateway
     ports:
-      - "8080:8080"
+      - "9999:9999"
     networks:
       - consul-network
     environment:
-      - SPRING_CLOUD_CONSUL_HOST=consul-server
-      - SPRING_CLOUD_CONSUL_DISCOVERY_HOSTNAME=gateway-service
-      - SPRING_CLOUD_CONSUL_DISCOVERY_PREFERIPADDRESS=false
+      SPRING_CLOUD_CONSUL_HOST: consul
+      SPRING_CLOUD_CONSUL_DISCOVERY_HOSTNAME: gateway
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:9999/actuator/health" ]
+      interval: 10s
+      timeout: 10s
+      retries: 5
     depends_on:
-      - consul-server
-      - config-service
+      - consul
+
 
 volumes:
   consul-data:

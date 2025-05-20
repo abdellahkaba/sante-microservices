@@ -8,15 +8,23 @@ spring:
       discovery:
         prefer-ip-address: true
         hostname: dossier-service
-        health-check-path: /dossier/actuator/health
+        health-check-path: /actuator/health
       host: consul-server
       port: 8500
 
-logging:
-  level:
-    org:
-      springframework:
-        web: DEBUG
-  file:
-    name: logs/logs.log
+server:
+  port: 8083
 
+---
+
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://postgres-ms:5432/dossier-db
+    username: username
+    password: password
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database: postgresql
+    database-platform: org.hibernate.dialect.PostgreSQLDialect

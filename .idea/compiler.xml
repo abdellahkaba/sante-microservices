@@ -7,9 +7,8 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="gateway" />
-        <module name="config-service" />
       </profile>
-      <profile name="Annotation profile for rdv-service" enabled="true">
+      <profile name="Annotation profile for dossier-service" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
@@ -25,6 +24,9 @@
         <module name="rdv-service" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="config-service" target="17" />
+    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">

@@ -1,12 +1,35 @@
 spring:
   application:
-    name: gateway-service
-  config:
-    import: optional:configserver:http://config-service:8888
+    name: gateway
   cloud:
     consul:
       discovery:
         prefer-ip-address: true
-        hostname: gateway-service
+        hostname: gateway
       host: consul-server
       port: 8500
+server:
+  port: 9999
+---
+
+spring:
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+      routes:
+        - id: patient-service
+          uri: lb:http://PATIENT-SERVICE
+          predicates:
+            - Path=/api/v1/patients/**
+
+        - id: dossier-service
+          uri: lb:http://DOSSIER-SERVICE
+          predicates:
+            - Path=/api/v1/dossiers/**
+
+        - id: rdv-service
+          uri: lb:http://RDV-SERVICE
+          predicates:
+            - Path=/api/v1/rdv/**

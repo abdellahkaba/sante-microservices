@@ -18,11 +18,12 @@ import java.util.List;
 @Getter
 @Setter
 @RestController
+@RequestMapping("/api/v1/dossiers")
 public class DossierController {
 
     private final DossierService service;
 
-    @PostMapping("new")
+    @PostMapping("/new")
     public ResponseEntity<DossierResponse> newDossier(
             @Valid @RequestBody DossierRequest request
     )
@@ -35,12 +36,12 @@ public class DossierController {
     }
 
 
-    @GetMapping("all")
+    @GetMapping("/all")
     public ResponseEntity<List<DossierResponse>> getAllDossier(){
         return ResponseEntity.status(HttpStatus.OK).body(service.getAllDossier());
     }
 
-    @PutMapping("update")
+    @PutMapping("/update")
     public ResponseEntity<DossierResponse> updatePatient(
             @Valid @RequestBody DossierRequest request) {
         DossierResponse updateDossier = service.updateDossier(request);

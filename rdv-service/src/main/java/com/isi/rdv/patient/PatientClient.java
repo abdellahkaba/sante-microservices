@@ -11,7 +11,7 @@ import java.util.Optional;
 )
 public interface PatientClient {
 
-    @GetMapping("/patient/{patient-id}")
+    @GetMapping("/api/v1/patients/{patient-id}")
     Optional<PatientResponse> findPatientById(@PathVariable("patient-id") Long patientId);
 
 }

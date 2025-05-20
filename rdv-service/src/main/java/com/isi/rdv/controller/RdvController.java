@@ -18,6 +18,7 @@ import java.util.List;
 @Getter
 @Setter
 @RestController
+@RequestMapping("/api/v1/rdv")
 public class RdvController {
 
     private final RdvService service;

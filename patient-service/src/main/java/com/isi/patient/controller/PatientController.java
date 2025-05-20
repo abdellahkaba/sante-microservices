@@ -19,11 +19,12 @@ import java.util.List;
 @Getter
 @Setter
 @RestController
+@RequestMapping("/api/v1/patients")
 public class PatientController {
 
    private final PatientService service;
 
-    @PostMapping("new")
+    @PostMapping("/new")
     public ResponseEntity<PatientResponse> newPatient(
             @Valid @RequestBody PatientRequest request
     )
@@ -36,12 +37,12 @@ public class PatientController {
         return ResponseEntity.status(HttpStatus.OK).body(service.getPatientById(id));
     }
 
-    @GetMapping("all")
+    @GetMapping("/all")
     public ResponseEntity<List<PatientResponse>> getAllPatient(){
         return ResponseEntity.status(HttpStatus.OK).body(service.getAllPatient());
     }
 
-    @PutMapping("update")
+    @PutMapping("/update")
     public ResponseEntity<PatientResponse> updatePatient(
             @Valid @RequestBody PatientRequest request) {
         PatientResponse updatePatient = service.updatePatient(request);
@@ -53,5 +54,4 @@ public class PatientController {
         service.deletePatientById(id);
         return ResponseEntity.noContent().build();
     }
-
 }
