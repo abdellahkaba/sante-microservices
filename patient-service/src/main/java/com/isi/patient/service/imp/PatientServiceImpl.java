@@ -66,6 +66,12 @@ public class PatientServiceImpl implements PatientService {
                         throw new EntityExistsException(messageSource.getMessage("email.exists", new Object[]{existingEmail}, Locale.getDefault() ));
                     }
                 });
+        repository.findByTelephone(request.getTelephone())
+                .ifPresent(existingTelephone -> {
+                    if (!existingTelephone.getId().equals(request.getId())) {
+                        throw new EntityExistsException(messageSource.getMessage("telephone.exists", new Object[]{existingTelephone}, Locale.getDefault()));
+                    }
+                });
         patient.setNom(request.getNom());
         patient.setPrenom(request.getPrenom());
         patient.setDateNaissance(request.getDateNaissance());

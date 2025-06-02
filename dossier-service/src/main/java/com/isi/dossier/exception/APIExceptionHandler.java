@@ -63,7 +63,5 @@ public class APIExceptionHandler {
         return new ResponseEntity<>(exception, BAD_REQUEST);
     }
 
-
-
 }
 

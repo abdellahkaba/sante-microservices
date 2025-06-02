@@ -1,0 +1,54 @@
+global:
+  scrape_interval: 10s
+  evaluation_interval: 10s
+
+scrape_configs:
+  # Configuration pour le gateway-service
+  - job_name: 'gateway'
+    metrics_path: '/actuator/prometheus'
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['gateway:9999']
+        labels:
+          application: 'API Gateway Service'
+          service_type: 'gateway'
+
+  # Configuration pour le patient-service
+  - job_name: 'patient_service'
+    metrics_path: '/actuator/prometheus'
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['patient-service:8081']
+        labels:
+          application: 'Patient Management Service'
+          service_type: 'backend'
+
+  - job_name: 'rdv-service'
+    metrics_path: '/actuator/prometheus'
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['rdv-service:8082']
+        labels:
+          application: 'RDV Management Service'
+          service_type: 'backend'
+
+  # Configuration pour le dossier-service
+  - job_name: 'dossier_service'
+    metrics_path: '/actuator/prometheus'
+    scrape_interval: 5s
+    static_configs:
+      - targets: [ 'dossier-service:8083' ]
+        labels:
+          application: 'Dossier Management Service'
+          service_type: 'backend'
+
+
+  # Configuration pour le medecin-service
+  - job_name: 'medecin_service'
+    metrics_path: '/actuator/prometheus'
+    scrape_interval: 5s
+    static_configs:
+      - targets: [ 'medecin-service:8084' ]
+        labels:
+          application: 'Medecin Management Service'
+          service_type: 'backend'

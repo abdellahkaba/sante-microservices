@@ -1,23 +1,24 @@
 services:
-  postgres:
-    container_name: postgres-ms
-    image: postgres
-    environment:
-      POSTGRES_USER: username
-      POSTGRES_PASSWORD: password
-      PGDATA: /var/lib/postgresql/data
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
-    networks:
-      - consul-network
-    restart: unless-stopped
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U username" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+#  postgres:
+#    container_name: postgres-ms
+#    image: postgres
+#    environment:
+#      POSTGRES_USER: username
+#      POSTGRES_PASSWORD: password
+#      PGDATA: /var/lib/postgresql/data
+#    volumes:
+#      - postgres_data:/var/lib/postgresql/data
+#      - ./init-db:/docker-entrypoint-initdb.d
+#    ports:
+#      - "5432:5432"
+#    networks:
+#      - consul-network
+#    restart: unless-stopped
+#    healthcheck:
+#      test: [ "CMD-SHELL", "pg_isready -U username" ]
+#      interval: 10s
+#      timeout: 5s
+#      retries: 5
 
   consul:
     image: consul:1.15.0
@@ -37,21 +38,77 @@ services:
       retries: 5
     restart: unless-stopped
 
-#  config-service:
-#    build: ./config-service
-#    container_name: config-service
-#    ports:
-#      - "8888:8888"
-#    networks:
-#      - consul-network
-#    environment:
-#      - SPRING_CLOUD_CONSUL_HOST=consul
-#      - SPRING_CLOUD_CONSUL_DISCOVERY_HOSTNAME=config-service
-#    healthcheck:
-#      test: [ "CMD", "curl", "-f", "http://localhost:8888/actuator/health" ]
-#      interval: 10s
-#      timeout: 10s
-#      retries: 5
+  ## Prometheus
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    restart: unless-stopped
+    networks:
+      - consul-network
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./docker/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+
+  ## Tempo
+  tempo:
+    image: grafana/tempo
+    container_name: tempo
+    command: [ "-config.file=/etc/tempo.yaml" ]
+    volumes:
+      - ./docker/tempo/tempo.yml:/etc/tempo.yaml:ro
+      - ./docker/tempo/tempo-data:/tmp/tempo
+    ports:
+      - "3200:3200" # Tempo
+      - "9411:9411" # zipkin
+    networks:
+      - consul-network
+
+  ## Loki
+  loki:
+    image: grafana/loki:main
+    container_name: loki
+    command: [ "-config.file=/etc/loki/local-config.yaml" ]
+    ports:
+      - "3100:3100"
+    networks:
+      - consul-network
+
+  ## grafana
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./docker/grafana:/etc/grafana/provisioning/datasources:ro
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=password
+    networks:
+      - consul-network
+
+  medecin-service:
+    build: ./medecin-service
+    container_name: medecin-service
+    ports:
+      - "7070:7070"
+    networks:
+      - consul-network
+    environment:
+      SPRING_CLOUD_CONSUL_HOST: consul
+      SPRING_CLOUD_CONSUL_DISCOVERY_HOSTNAME: medecin-service
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:7070/actuator/health" ]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+    depends_on:
+      - consul
+      - tempo
+      - loki
+    restart: always
 
   patient-service:
     build: ./patient-service
@@ -70,7 +127,9 @@ services:
       retries: 5
     depends_on:
       - consul
-      - postgres
+      - tempo
+      - loki
+    restart: always
 
   rdv-service:
     build: ./rdv-service
@@ -89,7 +148,9 @@ services:
       retries: 5
     depends_on:
       - consul
-      - postgres
+      - tempo
+      - loki
+    restart: always
 
   dossier-service:
     build: ./dossier-service
@@ -108,7 +169,9 @@ services:
       retries: 5
     depends_on:
       - consul
-      - postgres
+      - tempo
+      - loki
+    restart: always
 
   gateway:
     build: ./gateway
@@ -127,12 +190,30 @@ services:
       retries: 5
     depends_on:
       - consul
+      - tempo
+      - loki
+    restart: always
+
+#  keycloak:
+#    container_name: keycloak
+#    image: keycloak/keycloak:26.0
+#    ports:
+#      - "8080:8080"
+#    environment:
+#      KEYCLOAK_ADMIN: admin
+#      KEYCLOAK_ADMIN_PASSWORD: admin
+#    networks:
+#      - consul-network
+#    command:
+#      - "start-dev"
 
 
 volumes:
   consul-data:
-  postgres_data:
+#  postgres_data:
 
 networks:
   consul-network:
     driver: bridge
+#  keycloak:
+#    driver: local
