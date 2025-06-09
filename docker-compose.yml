@@ -21,7 +21,7 @@ services:
 #      retries: 5
 
   consul:
-    image: consul:1.15.0
+    image: hashicorp/consul:latest
     container_name: consul-server
     command: "agent -server -ui -node=consul-server -bootstrap-expect=1 -client=0.0.0.0"
     ports:
@@ -194,26 +194,25 @@ services:
       - loki
     restart: always
 
-#  keycloak:
-#    container_name: keycloak
-#    image: keycloak/keycloak:26.0
-#    ports:
-#      - "8080:8080"
-#    environment:
-#      KEYCLOAK_ADMIN: admin
-#      KEYCLOAK_ADMIN_PASSWORD: admin
-#    networks:
-#      - consul-network
-#    command:
-#      - "start-dev"
-
+  keycloak:
+    container_name: keycloak
+    image: keycloak/keycloak:26.0
+    command: [ "start-dev", "--import-realm" ]
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./keycloak/realms/:/opt/keycloak/data/import/
+    networks:
+      - consul-network
 
 volumes:
   consul-data:
-#  postgres_data:
 
 networks:
   consul-network:
     driver: bridge
-#  keycloak:
-#    driver: local
+  keycloak:
+    driver: local

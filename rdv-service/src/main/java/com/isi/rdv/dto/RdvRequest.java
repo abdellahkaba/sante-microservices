@@ -20,4 +20,6 @@ public class RdvRequest {
     private String motif;
     @NotNull(message = "patient requis")
     private Long patientId;
+    @NotNull(message = "Medecin requis")
+    private Long medecinId;
 }

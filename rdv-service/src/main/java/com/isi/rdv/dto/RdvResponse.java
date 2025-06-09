@@ -18,4 +18,11 @@ public class RdvResponse {
     private LocalDateTime date;
     private String motif;
     private Long patientId;
+    private Long medecinId;
+
+//    private String patientName;
+//    private String patientPrenom;
+//    private String patientEmail;
+//    private String medecinName;
+//    private String medecinPrenom;
 }

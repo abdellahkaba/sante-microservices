@@ -4,7 +4,7 @@ server:
 distributor:
   receivers:
     zipkin:
-      endpoint: 0.0.0.0:9411  # Écoute les spans Zipkin
+      endpoint: 0.0.0.0:9411
 
 storage:
   trace:

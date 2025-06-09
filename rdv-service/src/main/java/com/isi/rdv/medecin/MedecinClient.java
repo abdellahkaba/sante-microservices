@@ -9,8 +9,7 @@ import java.util.Optional;
 @FeignClient(
         name = "medecin-service"
 )
-interface MedecinClient {
-
+public interface MedecinClient {
     @GetMapping("/api/v1/medecins/{medecin-id}")
     Optional<MedecinResponse> findMedecinById(@PathVariable("medecin-id") Long medecinId);
 }

@@ -48,7 +48,7 @@ scrape_configs:
     metrics_path: '/actuator/prometheus'
     scrape_interval: 5s
     static_configs:
-      - targets: [ 'medecin-service:8084' ]
+      - targets: [ 'medecin-service:7070' ]
         labels:
           application: 'Medecin Management Service'
           service_type: 'backend'

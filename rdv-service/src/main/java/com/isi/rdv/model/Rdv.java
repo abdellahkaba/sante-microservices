@@ -19,4 +19,5 @@ public class Rdv {
     private LocalDateTime date;
     private String motif;
     private Long patientId;
+    private Long medecinId;
 }

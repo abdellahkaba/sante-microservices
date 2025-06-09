@@ -52,6 +52,34 @@ public class MedecinServiceApplication {
 					.email("fatima.sow@hopital.sn")
 					.adresseCabinet("Clinique de la Femme, Avenue Cheikh Anta Diop")
 					.build());
+
+
+			medecinRepository.save(Medecin.builder()
+					.nom("Diop")
+					.prenom("Cheikh")
+					.specialite("Chirurgie Orthopédique")
+					.telephone("77 654 32 10")
+					.email("cheikh.diop@hopital.sn")
+					.adresseCabinet("Pavillon Traumatologie, Hôpital Fann")
+					.build());
+
+			medecinRepository.save(Medecin.builder()
+					.nom("Gueye")
+					.prenom("Aïssatou")
+					.specialite("Dermatologie")
+					.telephone("76 789 01 23")
+					.email("a.gueye@hopital.sn")
+					.adresseCabinet("Centre de Dermatologie, Almadies")
+					.build());
+
+			medecinRepository.save(Medecin.builder()
+					.nom("Kane")
+					.prenom("Moussa")
+					.specialite("Ophtalmologie")
+					.telephone("70 456 78 90")
+					.email("moussa.kane@hopital.sn")
+					.adresseCabinet("Cabinet Vision Plus, Sacré-Cœur 3")
+					.build());
 		};
 	}
 }

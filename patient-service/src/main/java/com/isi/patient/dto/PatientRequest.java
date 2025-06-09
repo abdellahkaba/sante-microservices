@@ -31,7 +31,7 @@ public class PatientRequest {
     @NotBlank(message = "L'adresse est obligatoire")
     private String adresse;
     @NotBlank(message = "Le telephone est obligatoire")
-    @Pattern(regexp = "^\\+?[0-9]{10,15}$", message = "Le numéro de téléphone doit être valide (ex : +1234567890)")
+//    @Pattern(regexp = "^\\+?[0-9]{10,15}$", message = "Le numéro de téléphone doit être valide (ex : +1234567890)")
     private String telephone;
     @Email(message = "L'email est invalide")
     @NotBlank(message = "L'email est obligatoire")
