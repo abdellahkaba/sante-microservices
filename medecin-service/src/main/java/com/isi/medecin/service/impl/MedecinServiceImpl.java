@@ -21,6 +21,7 @@ import java.util.Locale;
 @Getter
 @Setter
 @AllArgsConstructor
+
 public class MedecinServiceImpl implements MedecinService {
 
     private final MedecinRepository repository;
@@ -48,7 +49,7 @@ public class MedecinServiceImpl implements MedecinService {
     public MedecinResponse getMedecinById(Long id) {
         return repository.findById(id)
                 .map(mapper::toMedecinResponse)
-                .orElseThrow(() -> new EntityNotFoundException(messageSource.getMessage("medecin.not.found", new Object[]{id}, Locale.getDefault())));
+                .orElseThrow(() -> new EntityNotFoundException(messageSource.getMessage("medecin.notfound", new Object[]{id}, Locale.getDefault())));
     }
 
     @Override
@@ -59,7 +60,7 @@ public class MedecinServiceImpl implements MedecinService {
     @Override
     public MedecinResponse updateMedecin(MedecinRequest request) {
         var medecin = repository.findById(request.getId())
-                .orElseThrow(() -> new EntityNotFoundException(messageSource.getMessage("patient.notfound", new Object[]{request.getId()}, Locale.getDefault())));
+                .orElseThrow(() -> new EntityNotFoundException(messageSource.getMessage("medecin.notfound", new Object[]{request.getId()}, Locale.getDefault())));
         repository.findByEmail(request.getEmail())
                 .ifPresent(existingEmail -> {
                     if (!existingEmail.getId().equals(request.getId())) {
@@ -84,7 +85,7 @@ public class MedecinServiceImpl implements MedecinService {
     @Override
     public void deleteMedecinById(Long id) {
         Medecin medecin = repository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(messageSource.getMessage("medecin.not.found", new Object[]{id}, Locale.getDefault())));
+                .orElseThrow(() -> new EntityNotFoundException(messageSource.getMessage("medecin.notfound", new Object[]{id}, Locale.getDefault())));
         repository.delete(medecin);
     }
 }

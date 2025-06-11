@@ -1,25 +1,4 @@
 services:
-#  postgres:
-#    container_name: postgres-ms
-#    image: postgres
-#    environment:
-#      POSTGRES_USER: username
-#      POSTGRES_PASSWORD: password
-#      PGDATA: /var/lib/postgresql/data
-#    volumes:
-#      - postgres_data:/var/lib/postgresql/data
-#      - ./init-db:/docker-entrypoint-initdb.d
-#    ports:
-#      - "5432:5432"
-#    networks:
-#      - consul-network
-#    restart: unless-stopped
-#    healthcheck:
-#      test: [ "CMD-SHELL", "pg_isready -U username" ]
-#      interval: 10s
-#      timeout: 5s
-#      retries: 5
-
   consul:
     image: hashicorp/consul:latest
     container_name: consul-server
@@ -208,8 +187,63 @@ services:
     networks:
       - consul-network
 
+    # Ajoutez ces services à votre docker-compose.yml existant
+
+  sonarqube:
+    image: sonarqube:community
+    container_name: sonarqube
+    ports:
+      - "9000:9000"
+    environment:
+      - SONAR_JDBC_URL=jdbc:postgresql://postgres-sonar:5432/sonar
+      - SONAR_JDBC_USERNAME=sonar
+      - SONAR_JDBC_PASSWORD=sonar
+    volumes:
+      - sonarqube_data:/opt/sonarqube/data
+      - sonarqube_extensions:/opt/sonarqube/extensions
+      - sonarqube_logs:/opt/sonarqube/logs
+    networks:
+      - consul-network
+    depends_on:
+      - postgres-sonar
+
+  postgres-sonar:
+    image: postgres:13
+    container_name: postgres-sonar
+    environment:
+      - POSTGRES_USER=sonar
+      - POSTGRES_PASSWORD=sonar
+      - POSTGRES_DB=sonar
+    volumes:
+      - postgresql_sonar:/var/lib/postgresql/data
+    networks:
+      - consul-network
+
+  jenkins:
+    image: jenkins/jenkins:lts
+    container_name: jenkins
+    ports:
+      - "8090:8080"
+      - "50000:50000"
+    volumes:
+      - jenkins_home:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - DOCKER_HOST=unix:///var/run/docker.sock
+    networks:
+      - consul-network
+    user: root
+
+  # Ajoutez ces volumes à la section volumes:
+
+
 volumes:
   consul-data:
+  sonarqube_data:
+  sonarqube_extensions:
+  sonarqube_logs:
+  postgresql_sonar:
+  jenkins_home:
 
 networks:
   consul-network:

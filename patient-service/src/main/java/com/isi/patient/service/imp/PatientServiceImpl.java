@@ -22,6 +22,7 @@ import java.util.Locale;
 @AllArgsConstructor
 @Getter
 @Setter
+
 public class PatientServiceImpl implements PatientService {
 
     private final PatientRepository repository;
