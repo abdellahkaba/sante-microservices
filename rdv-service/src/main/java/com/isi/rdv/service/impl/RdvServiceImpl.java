@@ -8,6 +8,7 @@ import com.isi.rdv.mapper.RdvMapper;
 import com.isi.rdv.medecin.MedecinClient;
 import com.isi.rdv.model.Rdv;
 import com.isi.rdv.patient.PatientClient;
+import com.isi.rdv.patient.PatientResponse;
 import com.isi.rdv.repository.RdvRepository;
 import com.isi.rdv.service.RdvService;
 import lombok.AllArgsConstructor;
@@ -36,8 +37,10 @@ public class RdvServiceImpl implements RdvService {
     public RdvResponse newRdv(RdvRequest request) {
 
         var patient = this.patientClient.findPatientById(request.getPatientId())
+
                 .orElseThrow(() -> new EntityNotFoundException(messageSource.getMessage("patient.notfound",
                         new Object[]{request.getPatientId()}, Locale.getDefault())));
+
         var medecin = this.medecinClient.findMedecinById(request.getMedecinId())
                 .orElseThrow(() -> new EntityNotFoundException(messageSource.getMessage("medecin.notfound",
                         new Object[]{request.getMedecinId()}, Locale.getDefault())));
@@ -67,11 +70,12 @@ public class RdvServiceImpl implements RdvService {
         var rdv = repository.findById(request.getId())
                 .orElseThrow(() -> new EntityNotFoundException(messageSource.getMessage("rdv.notfound", new Object[]{request.getId()}, Locale.getDefault())));
 
-        var patient = this.patientClient.findPatientById(request.getPatientId())
+        PatientResponse patient = this.patientClient.findPatientById(request.getPatientId())
                 .orElseThrow(() -> new EntityNotFoundException(messageSource.getMessage("patient.notfound",
                         new Object[]{request.getPatientId()}, Locale.getDefault())));
+
         var medecin = this.medecinClient.findMedecinById(request.getMedecinId())
-                        .orElseThrow(() -> new EntityNotFoundException(messageSource.getMessage("medecin.nofound",
+                        .orElseThrow(() -> new EntityNotFoundException(messageSource.getMessage("medecin.notfound",
                                 new Object[]{request.getMedecinId()}, Locale.getDefault() )));
 
         rdv.setPatientId(patient.getId());
